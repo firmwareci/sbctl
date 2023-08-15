@@ -107,12 +107,16 @@ func RunImportKeys(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("keyfile %s does not exist", s)
 			}
 		}
-		if _, err := util.ReadCertFromFile(key.Cert); err != nil {
-			return fmt.Errorf("invalid certificate file")
+
+		if enrollKeysCmdOptions.Force {
+			if _, err := util.ReadCertFromFile(key.Cert); err != nil {
+				return fmt.Errorf("invalid certificate file")
+			}
+			if _, err := util.ReadKeyFromFile(key.Key); err != nil {
+				return fmt.Errorf("invalid private key file")
+			}
 		}
-		if _, err := util.ReadKeyFromFile(key.Key); err != nil {
-			return fmt.Errorf("invalid private key file")
-		}
+
 		for src, dst := range map[string]string{
 			key.Cert: path.Join(sbctl.KeysPath, key.Type, key.Type+".pem"),
 			key.Key:  path.Join(sbctl.KeysPath, key.Type, key.Type+".key"),
